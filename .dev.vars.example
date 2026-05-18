@@ -1,0 +1,8 @@
+# Local development identity. Cloudflare Access isn't in front of the Worker
+# locally, so the app trusts this email as the signed-in user. Change it and
+# restart `npm run dev` to simulate a different account.
+ACCESS_DEV_EMAIL=you@example.com
+
+# Optional: an AI Gateway id to route Workers AI calls through for caching and
+# observability. Leave blank to call Workers AI directly.
+AI_GATEWAY_ID=

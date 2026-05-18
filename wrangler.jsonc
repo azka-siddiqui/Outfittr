@@ -1,0 +1,60 @@
+{
+  // Outfittr is deployed as a single Worker: it serves the built React app as
+  // static assets and handles /api/* routes with Hono. Replace the placeholder
+  // resource IDs before deploying (see README → Cloudflare Access).
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "outfittr",
+  "main": "src/worker/index.ts",
+  "compatibility_date": "2024-09-23",
+  "compatibility_flags": ["nodejs_compat"],
+
+  "assets": {
+    "directory": "./dist/client",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
+  },
+
+  "observability": {
+    "enabled": true
+  },
+
+  "vars": {
+    // Non-secret config. Secrets (none required for local) go in .dev.vars.
+    "TEAM_DOMAIN": "REPLACE_ME.cloudflareaccess.com",
+    "POLICY_AUD": "REPLACE_ME_ACCESS_POLICY_AUD"
+  },
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "outfittr-db",
+      "database_id": "REPLACE_ME_D1_DATABASE_ID",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  "r2_buckets": [
+    {
+      "binding": "MEDIA",
+      "bucket_name": "outfittr-media"
+    }
+  ],
+
+  "kv_namespaces": [
+    {
+      "binding": "CACHE",
+      "id": "REPLACE_ME_KV_NAMESPACE_ID"
+    }
+  ],
+
+  "ai": {
+    "binding": "AI"
+  },
+
+  "vectorize": [
+    {
+      "binding": "VECTORIZE",
+      "index_name": "outfittr-outfits"
+    }
+  ]
+}
