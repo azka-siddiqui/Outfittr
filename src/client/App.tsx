@@ -1,22 +1,50 @@
 import { useEffect, useState } from "react";
+import { HashRouter, Routes, Route, NavLink, Navigate } from "react-router-dom";
+import { api } from "./api";
+import { Closet } from "./pages/Closet";
+import { Upload } from "./pages/Upload";
+import type { UserProfile } from "../shared/types";
 
-// Placeholder shell. Routing, the closet, rankings and social feeds get built
-// out in later commits — for now this just confirms the Worker is reachable.
+// App shell: loads the signed-in profile, then renders the routed views with a
+// mobile-first bottom nav. More tabs (rankings, feed, search) arrive later.
 export function App() {
-  const [status, setStatus] = useState<string>("…");
+  const [me, setMe] = useState<UserProfile | null>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    fetch("/api/health")
-      .then((r) => r.json())
-      .then((d: { status: string }) => setStatus(d.status))
-      .catch(() => setStatus("unreachable"));
+    api
+      .me()
+      .then(setMe)
+      .catch(() => setMe(null))
+      .finally(() => setReady(true));
   }, []);
 
+  if (!ready) {
+    return <div className="boot">…</div>;
+  }
+
   return (
-    <main className="app">
-      <h1>Outfittr</h1>
-      <p className="tagline">Your closet, ranked.</p>
-      <p className="status">api: {status}</p>
-    </main>
+    <HashRouter>
+      <div className="shell">
+        <header className="topbar">
+          <span className="logo">Outfittr</span>
+          {me && <span className="handle">@{me.handle}</span>}
+        </header>
+
+        <main className="content">
+          <Routes>
+            <Route path="/" element={<Navigate to="/closet" replace />} />
+            <Route path="/closet" element={<Closet />} />
+            <Route path="/upload" element={<Upload />} />
+            <Route path="*" element={<Navigate to="/closet" replace />} />
+          </Routes>
+        </main>
+
+        <nav className="tabbar">
+          <NavLink to="/closet">Closet</NavLink>
+          <NavLink to="/upload">Upload</NavLink>
+        </nav>
+      </div>
+    </HashRouter>
   );
 }
