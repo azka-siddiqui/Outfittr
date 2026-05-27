@@ -172,3 +172,88 @@ button:disabled {
   opacity: 0.5;
   cursor: default;
 }
+
+
+/* outfit detail + pins */
+.photo-wrap {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.photo-wrap img {
+  width: 100%;
+  display: block;
+}
+
+.pin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pin-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--accent);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.4);
+  flex: none;
+}
+
+.pin-label {
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pin.draft .pin-dot {
+  border-color: #fff;
+  background: var(--accent);
+}
+
+.pin-x {
+  background: transparent;
+  border: none;
+  color: #ff8ab0;
+  padding: 0;
+  font-size: 0.9rem;
+  cursor: pointer;
+  width: auto;
+}
+
+.detail-actions {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.tag-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tag-form input {
+  flex: 1;
+}
+
+button.ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--fg);
+}
+
+.caption {
+  color: var(--muted);
+}

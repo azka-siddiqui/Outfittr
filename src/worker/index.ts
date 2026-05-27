@@ -3,6 +3,7 @@ import type { Env } from "./env";
 import me from "./routes/me";
 import outfits from "./routes/outfits";
 import collections from "./routes/collections";
+import garments from "./routes/garments";
 import media from "./routes/media";
 
 // One Worker serves both the API and the React app. Hono owns /api/*; anything
@@ -14,6 +15,7 @@ app.get("/api/health", (c) => c.json({ status: "ok" }));
 app.route("/api/me", me);
 app.route("/api/outfits", outfits);
 app.route("/api/collections", collections);
+app.route("/api/garments", garments);
 app.route("/api/media", media);
 
 // Fall through to the SPA for all non-API routes.

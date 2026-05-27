@@ -36,6 +36,23 @@ export interface Collection {
   createdAt: number;
 }
 
+export interface Garment {
+  id: string;
+  outfitId: string;
+  name: string;
+  brand: string | null;
+  store: string | null;
+  priceCents: number | null;
+  size: string | null;
+  // Normalized 0..1 position on the photo, or null if unplaced.
+  pinX: number | null;
+  pinY: number | null;
+}
+
+export interface OutfitDetail extends Outfit {
+  garments: Garment[];
+}
+
 // URL for an outfit's authenticated media (photo, or cutout variant).
 export function outfitImageUrl(outfitId: string, variant?: "cutout"): string {
   const q = variant ? `?variant=${variant}` : "";

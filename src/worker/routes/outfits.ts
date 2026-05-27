@@ -3,10 +3,11 @@ import { and, desc, eq } from "drizzle-orm";
 import type { Env } from "../env";
 import { requireAuth, type AuthVars } from "../middleware/auth";
 import { getDb } from "../db";
-import { outfits, collections } from "../db/schema";
+import { outfits, collections, garments } from "../db/schema";
 import type { Outfit } from "../db/schema";
 import { newId, now } from "../lib/id";
 import { isAllowedImage, photoKey } from "../lib/media";
+import { canViewUser } from "../lib/visibility";
 
 const route = new Hono<{ Bindings: Env; Variables: AuthVars }>();
 
@@ -77,8 +78,8 @@ route.post("/", async (c) => {
   return c.json({ id: outfit.id }, 201);
 });
 
-// Fetch a single outfit the caller owns (broader read access comes with the
-// social/visibility work later).
+// Fetch a single outfit with its garment pins. Readable by the owner or anyone
+// allowed to view the owner (public accounts; approved followers later).
 route.get("/:id", async (c) => {
   const user = c.get("user");
   const db = getDb(c.env);
@@ -88,10 +89,18 @@ route.get("/:id", async (c) => {
     .where(eq(outfits.id, c.req.param("id")))
     .get();
 
-  if (!outfit || outfit.userId !== user.id) {
+  if (!outfit) return c.json({ error: "not found" }, 404);
+  if (!(await canViewUser(db, user.id, outfit.userId))) {
     return c.json({ error: "not found" }, 404);
   }
-  return c.json(outfit);
+
+  const pins = await db
+    .select()
+    .from(garments)
+    .where(eq(garments.outfitId, outfit.id))
+    .all();
+
+  return c.json({ ...outfit, garments: pins });
 });
 
 // Move an outfit into a collection (or out of one with collectionId: null).

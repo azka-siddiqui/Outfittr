@@ -3,6 +3,7 @@ import { HashRouter, Routes, Route, NavLink, Navigate } from "react-router-dom";
 import { api } from "./api";
 import { Closet } from "./pages/Closet";
 import { Upload } from "./pages/Upload";
+import { OutfitDetail } from "./pages/OutfitDetail";
 import type { UserProfile } from "../shared/types";
 
 // App shell: loads the signed-in profile, then renders the routed views with a
@@ -36,6 +37,7 @@ export function App() {
             <Route path="/" element={<Navigate to="/closet" replace />} />
             <Route path="/closet" element={<Closet />} />
             <Route path="/upload" element={<Upload />} />
+            <Route path="/outfit/:id" element={<OutfitDetail />} />
             <Route path="*" element={<Navigate to="/closet" replace />} />
           </Routes>
         </main>

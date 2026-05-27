@@ -1,4 +1,10 @@
-import type { UserProfile, Outfit, Collection } from "../shared/types";
+import type {
+  UserProfile,
+  Outfit,
+  Collection,
+  Garment,
+  OutfitDetail,
+} from "../shared/types";
 
 // Thin fetch wrapper. All API routes are same-origin and rely on the Access
 // cookie (or the local dev identity), so no auth headers are needed here.
@@ -8,15 +14,17 @@ async function get<T>(path: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-async function postJson<T>(path: string, body: unknown): Promise<T> {
+async function send<T>(method: string, path: string, body?: unknown): Promise<T> {
   const res = await fetch(path, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    method,
+    headers: body !== undefined ? { "Content-Type": "application/json" } : undefined,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
   });
   if (!res.ok) throw new Error(`${res.status}`);
   return res.json() as Promise<T>;
 }
+
+const postJson = <T>(path: string, body: unknown) => send<T>("POST", path, body);
 
 export const api = {
   me: () => get<UserProfile>("/api/me"),
@@ -25,6 +33,13 @@ export const api = {
   collections: () => get<Collection[]>("/api/collections"),
   createCollection: (name: string) =>
     postJson<Collection>("/api/collections", { name }),
+
+  outfit: (id: string) => get<OutfitDetail>(`/api/outfits/${id}`),
+  addGarment: (outfitId: string, g: Partial<Garment> & { name: string }) =>
+    postJson<Garment>(`/api/garments/outfit/${outfitId}`, g),
+  updateGarment: (id: string, g: Partial<Garment>) =>
+    send<{ ok: true }>("PUT", `/api/garments/${id}`, g),
+  deleteGarment: (id: string) => send<{ ok: true }>("DELETE", `/api/garments/${id}`),
 
   // Upload uses multipart, so it bypasses the JSON helper.
   async upload(form: FormData): Promise<{ id: string }> {
