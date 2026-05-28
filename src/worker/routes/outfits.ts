@@ -103,6 +103,58 @@ route.get("/:id", async (c) => {
   return c.json({ ...outfit, garments: pins });
 });
 
+// Edit an outfit's metadata (caption, aesthetic, occasion). Photo and Elo are
+// left untouched here.
+route.patch("/:id", async (c) => {
+  const user = c.get("user");
+  const db = getDb(c.env);
+  const outfit = await db
+    .select()
+    .from(outfits)
+    .where(eq(outfits.id, c.req.param("id")))
+    .get();
+  if (!outfit || outfit.userId !== user.id) {
+    return c.json({ error: "not found" }, 404);
+  }
+
+  const body = await c.req.json<{
+    caption?: string | null;
+    aesthetic?: string | null;
+    occasion?: string | null;
+  }>();
+
+  await db
+    .update(outfits)
+    .set({
+      caption: body.caption !== undefined ? body.caption : outfit.caption,
+      aesthetic: body.aesthetic !== undefined ? body.aesthetic : outfit.aesthetic,
+      occasion: body.occasion !== undefined ? body.occasion : outfit.occasion,
+    })
+    .where(eq(outfits.id, outfit.id));
+  return c.json({ ok: true });
+});
+
+// Delete an outfit and its R2 objects. Garments are removed by the FK cascade.
+route.delete("/:id", async (c) => {
+  const user = c.get("user");
+  const db = getDb(c.env);
+  const outfit = await db
+    .select()
+    .from(outfits)
+    .where(eq(outfits.id, c.req.param("id")))
+    .get();
+  if (!outfit || outfit.userId !== user.id) {
+    return c.json({ error: "not found" }, 404);
+  }
+
+  // Best-effort media cleanup, then remove the row.
+  const keys = [outfit.photoKey, outfit.cutoutKey].filter(Boolean) as string[];
+  await Promise.all(keys.map((k) => c.env.MEDIA.delete(k)));
+  await db.delete(outfits).where(eq(outfits.id, outfit.id));
+
+  return c.json({ ok: true });
+});
+
 // Move an outfit into a collection (or out of one with collectionId: null).
 route.put("/:id/collection", async (c) => {
   const user = c.get("user");

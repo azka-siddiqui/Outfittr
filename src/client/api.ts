@@ -35,6 +35,11 @@ export const api = {
     postJson<Collection>("/api/collections", { name }),
 
   outfit: (id: string) => get<OutfitDetail>(`/api/outfits/${id}`),
+  editOutfit: (
+    id: string,
+    patch: { caption?: string | null; aesthetic?: string | null; occasion?: string | null }
+  ) => send<{ ok: true }>("PATCH", `/api/outfits/${id}`, patch),
+  deleteOutfit: (id: string) => send<{ ok: true }>("DELETE", `/api/outfits/${id}`),
   addGarment: (outfitId: string, g: Partial<Garment> & { name: string }) =>
     postJson<Garment>(`/api/garments/outfit/${outfitId}`, g),
   updateGarment: (id: string, g: Partial<Garment>) =>

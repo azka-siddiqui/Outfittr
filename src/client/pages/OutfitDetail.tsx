@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
 import { outfitImageUrl, type OutfitDetail as Detail, type Garment } from "../../shared/types";
 
@@ -11,11 +11,13 @@ function priceLabel(cents: number | null): string {
 // the outfit, tapping an empty spot drops a new pin to tag a garment there.
 export function OutfitDetail() {
   const { id = "" } = useParams();
+  const navigate = useNavigate();
   const [detail, setDetail] = useState<Detail | null>(null);
   const [showPins, setShowPins] = useState(true);
   const [me, setMe] = useState<string | null>(null);
   const [draft, setDraft] = useState<{ x: number; y: number } | null>(null);
   const [name, setName] = useState("");
+  const [editing, setEditing] = useState(false);
   const imgWrap = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -47,6 +49,26 @@ export function OutfitDetail() {
     setDetail((d) =>
       d ? { ...d, garments: d.garments.filter((x: Garment) => x.id !== gid) } : d
     );
+  }
+
+  async function saveEdits(patch: {
+    caption: string;
+    aesthetic: string;
+    occasion: string;
+  }) {
+    await api.editOutfit(id, {
+      caption: patch.caption || null,
+      aesthetic: patch.aesthetic || null,
+      occasion: patch.occasion || null,
+    });
+    setDetail((d) => (d ? { ...d, ...patch } : d));
+    setEditing(false);
+  }
+
+  async function removeOutfit() {
+    if (!confirm("Delete this outfit?")) return;
+    await api.deleteOutfit(id);
+    navigate("/closet");
   }
 
   return (
@@ -87,7 +109,29 @@ export function OutfitDetail() {
         <button className="ghost" onClick={() => setShowPins((s) => !s)}>
           {showPins ? "Hide tags" : "Show tags"}
         </button>
+        {owner && (
+          <>
+            <button className="ghost" onClick={() => setEditing((e) => !e)}>
+              Edit
+            </button>
+            <button className="ghost danger" onClick={removeOutfit}>
+              Delete
+            </button>
+          </>
+        )}
       </div>
+
+      {editing && owner && (
+        <EditForm
+          initial={{
+            caption: detail.caption ?? "",
+            aesthetic: detail.aesthetic ?? "",
+            occasion: detail.occasion ?? "",
+          }}
+          onSave={saveEdits}
+          onCancel={() => setEditing(false)}
+        />
+      )}
 
       {draft && owner && (
         <div className="tag-form">
@@ -108,5 +152,41 @@ export function OutfitDetail() {
 
       {detail.caption && <p className="caption">{detail.caption}</p>}
     </section>
+  );
+}
+
+function EditForm({
+  initial,
+  onSave,
+  onCancel,
+}: {
+  initial: { caption: string; aesthetic: string; occasion: string };
+  onSave: (patch: { caption: string; aesthetic: string; occasion: string }) => void;
+  onCancel: () => void;
+}) {
+  const [caption, setCaption] = useState(initial.caption);
+  const [aesthetic, setAesthetic] = useState(initial.aesthetic);
+  const [occasion, setOccasion] = useState(initial.occasion);
+
+  return (
+    <div className="edit-form">
+      <input placeholder="Caption" value={caption} onChange={(e) => setCaption(e.target.value)} />
+      <input
+        placeholder="Aesthetic"
+        value={aesthetic}
+        onChange={(e) => setAesthetic(e.target.value)}
+      />
+      <input
+        placeholder="Occasion"
+        value={occasion}
+        onChange={(e) => setOccasion(e.target.value)}
+      />
+      <div className="edit-actions">
+        <button onClick={() => onSave({ caption, aesthetic, occasion })}>Save</button>
+        <button className="ghost" onClick={onCancel}>
+          Cancel
+        </button>
+      </div>
+    </div>
   );
 }

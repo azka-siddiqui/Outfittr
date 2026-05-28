@@ -257,3 +257,21 @@ button.ghost {
 .caption {
   color: var(--muted);
 }
+
+
+button.danger {
+  color: #ff8ab0;
+  border-color: #5a2e3e;
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
+}
