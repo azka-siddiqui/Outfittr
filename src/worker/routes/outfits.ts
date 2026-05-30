@@ -13,24 +13,43 @@ const route = new Hono<{ Bindings: Env; Variables: AuthVars }>();
 
 route.use("*", requireAuth);
 
-// List the signed-in user's closet, newest first. Optionally scoped to one
-// collection via ?collection=<id>.
+// List the signed-in user's closet, newest first. Filterable by collection,
+// aesthetic, and occasion (all optional, combined with AND).
 route.get("/", async (c) => {
   const user = c.get("user");
   const db = getDb(c.env);
-  const collectionId = c.req.query("collection");
 
-  const where = collectionId
-    ? and(eq(outfits.userId, user.id), eq(outfits.collectionId, collectionId))
-    : eq(outfits.userId, user.id);
+  const conditions = [eq(outfits.userId, user.id)];
+  const collectionId = c.req.query("collection");
+  const aesthetic = c.req.query("aesthetic");
+  const occasion = c.req.query("occasion");
+  if (collectionId) conditions.push(eq(outfits.collectionId, collectionId));
+  if (aesthetic) conditions.push(eq(outfits.aesthetic, aesthetic));
+  if (occasion) conditions.push(eq(outfits.occasion, occasion));
 
   const rows = await db
     .select()
     .from(outfits)
-    .where(where)
+    .where(and(...conditions))
     .orderBy(desc(outfits.createdAt))
     .all();
   return c.json(rows);
+});
+
+// The distinct aesthetics + occasions present in the user's closet, so the
+// client can render filter chips without hard-coding a taxonomy.
+route.get("/facets", async (c) => {
+  const user = c.get("user");
+  const db = getDb(c.env);
+  const rows = await db
+    .select({ aesthetic: outfits.aesthetic, occasion: outfits.occasion })
+    .from(outfits)
+    .where(eq(outfits.userId, user.id))
+    .all();
+
+  const aesthetics = [...new Set(rows.map((r) => r.aesthetic).filter(Boolean))] as string[];
+  const occasions = [...new Set(rows.map((r) => r.occasion).filter(Boolean))] as string[];
+  return c.json({ aesthetics: aesthetics.sort(), occasions: occasions.sort() });
 });
 
 // Create an outfit: multipart upload with the photo plus optional metadata.

@@ -28,8 +28,15 @@ const postJson = <T>(path: string, body: unknown) => send<T>("POST", path, body)
 
 export const api = {
   me: () => get<UserProfile>("/api/me"),
-  closet: (collectionId?: string) =>
-    get<Outfit[]>(`/api/outfits${collectionId ? `?collection=${collectionId}` : ""}`),
+  closet: (filters?: { collection?: string; aesthetic?: string; occasion?: string }) => {
+    const q = new URLSearchParams();
+    if (filters?.collection) q.set("collection", filters.collection);
+    if (filters?.aesthetic) q.set("aesthetic", filters.aesthetic);
+    if (filters?.occasion) q.set("occasion", filters.occasion);
+    const qs = q.toString();
+    return get<Outfit[]>(`/api/outfits${qs ? `?${qs}` : ""}`);
+  },
+  facets: () => get<{ aesthetics: string[]; occasions: string[] }>("/api/outfits/facets"),
   collections: () => get<Collection[]>("/api/collections"),
   createCollection: (name: string) =>
     postJson<Collection>("/api/collections", { name }),

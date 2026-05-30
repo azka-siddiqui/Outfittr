@@ -2,24 +2,42 @@ import { useEffect, useState } from "react";
 import { api } from "../api";
 import { outfitImageUrl, type Outfit, type Collection } from "../../shared/types";
 
-// The digital closet: the signed-in user's outfits, optionally scoped to a
-// collection. Tapping an outfit opens its detail (garment pins) in a later
-// commit; for now it's a responsive grid.
+type Facets = { aesthetics: string[]; occasions: string[] };
+
+// The digital closet: the signed-in user's outfits, filterable by collection,
+// aesthetic, and occasion. Tapping an outfit opens its detail (garment pins).
 export function Closet() {
   const [outfits, setOutfits] = useState<Outfit[]>([]);
   const [collections, setCollections] = useState<Collection[]>([]);
-  const [activeCollection, setActiveCollection] = useState<string | undefined>();
+  const [facets, setFacets] = useState<Facets>({ aesthetics: [], occasions: [] });
+  const [collection, setCollection] = useState<string | undefined>();
+  const [aesthetic, setAesthetic] = useState<string | undefined>();
+  const [occasion, setOccasion] = useState<string | undefined>();
   const [loading, setLoading] = useState(true);
+
+  // Static filter lists load once; the grid reloads whenever a filter changes.
+  useEffect(() => {
+    Promise.all([api.collections(), api.facets()]).then(([cols, f]) => {
+      setCollections(cols);
+      setFacets(f);
+    });
+  }, []);
 
   useEffect(() => {
     setLoading(true);
-    Promise.all([api.closet(activeCollection), api.collections()])
-      .then(([o, cols]) => {
-        setOutfits(o);
-        setCollections(cols);
-      })
+    api
+      .closet({ collection, aesthetic, occasion })
+      .then(setOutfits)
       .finally(() => setLoading(false));
-  }, [activeCollection]);
+  }, [collection, aesthetic, occasion]);
+
+  function toggle(
+    value: string,
+    current: string | undefined,
+    set: (v: string | undefined) => void
+  ) {
+    set(current === value ? undefined : value);
+  }
 
   return (
     <section className="closet">
@@ -28,27 +46,47 @@ export function Closet() {
       </header>
 
       <div className="chips">
-        <button
-          className={!activeCollection ? "chip active" : "chip"}
-          onClick={() => setActiveCollection(undefined)}
-        >
+        <button className={!collection ? "chip active" : "chip"} onClick={() => setCollection(undefined)}>
           All
         </button>
         {collections.map((col) => (
           <button
             key={col.id}
-            className={activeCollection === col.id ? "chip active" : "chip"}
-            onClick={() => setActiveCollection(col.id)}
+            className={collection === col.id ? "chip active" : "chip"}
+            onClick={() => toggle(col.id, collection, setCollection)}
           >
             {col.name}
           </button>
         ))}
       </div>
 
+      {(facets.aesthetics.length > 0 || facets.occasions.length > 0) && (
+        <div className="chips filters">
+          {facets.aesthetics.map((a) => (
+            <button
+              key={`a-${a}`}
+              className={aesthetic === a ? "chip active" : "chip"}
+              onClick={() => toggle(a, aesthetic, setAesthetic)}
+            >
+              {a}
+            </button>
+          ))}
+          {facets.occasions.map((o) => (
+            <button
+              key={`o-${o}`}
+              className={occasion === o ? "chip active occasion" : "chip occasion"}
+              onClick={() => toggle(o, occasion, setOccasion)}
+            >
+              {o}
+            </button>
+          ))}
+        </div>
+      )}
+
       {loading ? (
         <p className="muted">Loading…</p>
       ) : outfits.length === 0 ? (
-        <p className="muted">No outfits yet. Upload your first look.</p>
+        <p className="muted">No outfits match these filters.</p>
       ) : (
         <div className="grid">
           {outfits.map((o) => (

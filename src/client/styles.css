@@ -275,3 +275,17 @@ button.danger {
   display: flex;
   gap: 8px;
 }
+
+
+.chips.filters {
+  margin-top: -4px;
+}
+
+.chip.occasion {
+  border-style: dashed;
+}
+
+.chip.occasion.active {
+  border-color: #6cc4e8;
+  color: #6cc4e8;
+}
