@@ -87,6 +87,34 @@ export const garments = sqliteTable(
   })
 );
 
+// Records every head-to-head comparison so ratings are auditable and we can
+// avoid showing the same pair repeatedly. `dimension` is the leaderboard the
+// match counted toward.
+export const matchResults = sqliteTable(
+  "match_results",
+  {
+    id: text("id").primaryKey(),
+    // Who did the ranking.
+    voterId: text("voter_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    dimension: text("dimension").notNull(), // "overall" | "aesthetic" | "occasion"
+    winnerId: text("winner_id")
+      .notNull()
+      .references(() => outfits.id, { onDelete: "cascade" }),
+    loserId: text("loser_id")
+      .notNull()
+      .references(() => outfits.id, { onDelete: "cascade" }),
+    createdAt: integer("created_at").notNull(),
+  },
+  (t) => ({
+    voterIdx: index("match_voter_idx").on(t.voterId),
+    dimIdx: index("match_dimension_idx").on(t.dimension),
+  })
+);
+
+export type MatchResult = typeof matchResults.$inferSelect;
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Outfit = typeof outfits.$inferSelect;
