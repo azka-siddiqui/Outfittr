@@ -4,6 +4,7 @@ import type {
   Collection,
   Garment,
   OutfitDetail,
+  Dimension,
 } from "../shared/types";
 
 // Thin fetch wrapper. All API routes are same-origin and rely on the Access
@@ -52,6 +53,18 @@ export const api = {
   updateGarment: (id: string, g: Partial<Garment>) =>
     send<{ ok: true }>("PUT", `/api/garments/${id}`, g),
   deleteGarment: (id: string) => send<{ ok: true }>("DELETE", `/api/garments/${id}`),
+
+  rankPair: () => get<Outfit[]>("/api/rankings/pair"),
+  vote: (dimension: Dimension, winnerId: string, loserId: string) =>
+    postJson<{ winner: number; loser: number }>("/api/rankings/vote", {
+      dimension,
+      winnerId,
+      loserId,
+    }),
+  leaderboard: (dimension: Dimension) =>
+    get<{ dimension: Dimension; outfits: Outfit[] }>(
+      `/api/rankings/leaderboard/${dimension}`
+    ),
 
   // Upload uses multipart, so it bypasses the JSON helper.
   async upload(form: FormData): Promise<{ id: string }> {

@@ -53,6 +53,14 @@ export interface OutfitDetail extends Outfit {
   garments: Garment[];
 }
 
+export type Dimension = "overall" | "aesthetic" | "occasion";
+
+export const DIMENSION_LABELS: Record<Dimension, string> = {
+  overall: "Overall",
+  aesthetic: "Aesthetic",
+  occasion: "Occasion",
+};
+
 // URL for an outfit's authenticated media (photo, or cutout variant).
 export function outfitImageUrl(outfitId: string, variant?: "cutout"): string {
   const q = variant ? `?variant=${variant}` : "";

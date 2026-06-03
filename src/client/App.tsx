@@ -4,6 +4,8 @@ import { api } from "./api";
 import { Closet } from "./pages/Closet";
 import { Upload } from "./pages/Upload";
 import { OutfitDetail } from "./pages/OutfitDetail";
+import { Compare } from "./pages/Compare";
+import { Leaderboard } from "./pages/Leaderboard";
 import type { UserProfile } from "../shared/types";
 
 // App shell: loads the signed-in profile, then renders the routed views with a
@@ -38,12 +40,16 @@ export function App() {
             <Route path="/closet" element={<Closet />} />
             <Route path="/upload" element={<Upload />} />
             <Route path="/outfit/:id" element={<OutfitDetail />} />
+            <Route path="/rank" element={<Compare />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="*" element={<Navigate to="/closet" replace />} />
           </Routes>
         </main>
 
         <nav className="tabbar">
           <NavLink to="/closet">Closet</NavLink>
+          <NavLink to="/rank">Rank</NavLink>
+          <NavLink to="/leaderboard">Ranks</NavLink>
           <NavLink to="/upload">Upload</NavLink>
         </nav>
       </div>
