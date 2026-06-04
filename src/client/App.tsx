@@ -6,6 +6,7 @@ import { Upload } from "./pages/Upload";
 import { OutfitDetail } from "./pages/OutfitDetail";
 import { Compare } from "./pages/Compare";
 import { Leaderboard } from "./pages/Leaderboard";
+import { GuidedRanking } from "./pages/GuidedRanking";
 import type { UserProfile } from "../shared/types";
 
 // App shell: loads the signed-in profile, then renders the routed views with a
@@ -42,6 +43,7 @@ export function App() {
             <Route path="/outfit/:id" element={<OutfitDetail />} />
             <Route path="/rank" element={<Compare />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/guided" element={<GuidedRanking />} />
             <Route path="*" element={<Navigate to="/closet" replace />} />
           </Routes>
         </main>

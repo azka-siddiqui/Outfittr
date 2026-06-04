@@ -23,7 +23,8 @@ export function Upload() {
       if (aesthetic) form.set("aesthetic", aesthetic);
       if (occasion) form.set("occasion", occasion);
       const { id } = await api.upload(form);
-      window.location.hash = `#/outfit/${id}`;
+      // Send the user into the guided ranking flow to seed the new outfit.
+      window.location.hash = `#/guided?new=${id}`;
     } catch {
       setError("Upload failed. Try again.");
     } finally {

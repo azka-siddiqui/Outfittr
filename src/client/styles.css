@@ -378,3 +378,22 @@ button.danger {
   color: var(--accent);
   font-weight: 600;
 }
+
+
+/* guided ranking */
+.guided-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.guided-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.skip {
+  margin-top: 16px;
+  width: 100%;
+}
