@@ -1,12 +1,11 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { Db } from "../db";
-import { users } from "../db/schema";
+import { users, follows } from "../db/schema";
 
 // Decides whether `viewerId` may see content owned by `ownerId`.
 //
-// For now: the owner always can; a public account is visible to any signed-in
-// user; a private account is visible only to the owner. Once the follow graph
-// exists, approved followers of a private account are added here.
+// The owner always can; a public account is visible to any signed-in user; a
+// private account is visible to the owner and to accepted followers.
 export async function canViewUser(
   db: Db,
   viewerId: string,
@@ -16,6 +15,12 @@ export async function canViewUser(
 
   const owner = await db.select().from(users).where(eq(users.id, ownerId)).get();
   if (!owner) return false;
+  if (!owner.isPrivate) return true;
 
-  return !owner.isPrivate;
+  const rel = await db
+    .select()
+    .from(follows)
+    .where(and(eq(follows.followerId, viewerId), eq(follows.followingId, ownerId)))
+    .get();
+  return rel?.status === "accepted";
 }

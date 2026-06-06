@@ -1,4 +1,11 @@
-import { sqliteTable, text, integer, real, index } from "drizzle-orm/sqlite-core";
+import {
+  sqliteTable,
+  text,
+  integer,
+  real,
+  index,
+  primaryKey,
+} from "drizzle-orm/sqlite-core";
 
 // D1 is SQLite. We use text ids (uuids) generated in the Worker so inserts
 // don't need a round-trip to read the id back. Timestamps are unix millis.
@@ -86,6 +93,31 @@ export const garments = sqliteTable(
     outfitIdx: index("garments_outfit_idx").on(t.outfitId),
   })
 );
+
+// The follow graph. A row means `followerId` follows `followingId`. For public
+// accounts the status is "accepted" immediately; for private accounts it stays
+// "pending" until the owner approves the request.
+export const follows = sqliteTable(
+  "follows",
+  {
+    followerId: text("follower_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    followingId: text("following_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    status: text("status").notNull(), // "pending" | "accepted"
+    createdAt: integer("created_at").notNull(),
+  },
+  (t) => ({
+    // A directed pair is unique.
+    pk: primaryKey({ columns: [t.followerId, t.followingId] }),
+    // The reverse direction (who follows me) is queried for followers lists.
+    followingIdx: index("follows_following_idx").on(t.followingId),
+  })
+);
+
+export type Follow = typeof follows.$inferSelect;
 
 // Records every head-to-head comparison so ratings are auditable and we can
 // avoid showing the same pair repeatedly. `dimension` is the leaderboard the
