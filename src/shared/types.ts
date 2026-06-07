@@ -53,6 +53,15 @@ export interface OutfitDetail extends Outfit {
   garments: Garment[];
 }
 
+export type FollowStatus = "none" | "pending" | "accepted";
+
+export interface FollowRequest {
+  followerId: string;
+  handle: string;
+  displayName: string;
+  createdAt: number;
+}
+
 export type Dimension = "overall" | "aesthetic" | "occasion";
 
 export const DIMENSION_LABELS: Record<Dimension, string> = {

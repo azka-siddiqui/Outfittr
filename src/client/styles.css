@@ -397,3 +397,39 @@ button.danger {
   margin-top: 16px;
   width: 100%;
 }
+
+
+/* follow requests */
+.request-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.request-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.who {
+  display: flex;
+  flex-direction: column;
+}
+
+.who .muted {
+  font-size: 0.8rem;
+}
+
+.req-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.req-actions button {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  width: auto;
+}

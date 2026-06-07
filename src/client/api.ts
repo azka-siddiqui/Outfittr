@@ -5,6 +5,8 @@ import type {
   Garment,
   OutfitDetail,
   Dimension,
+  FollowStatus,
+  FollowRequest,
 } from "../shared/types";
 
 // Thin fetch wrapper. All API routes are same-origin and rely on the Access
@@ -65,6 +67,18 @@ export const api = {
     get<{ dimension: Dimension; outfits: Outfit[] }>(
       `/api/rankings/leaderboard/${dimension}`
     ),
+
+  follow: (userId: string) => postJson<{ status: FollowStatus }>(`/api/follows/${userId}`, {}),
+  unfollow: (userId: string) => send<{ ok: true }>("DELETE", `/api/follows/${userId}`),
+  followStatus: (userId: string) =>
+    get<{ status: FollowStatus }>(`/api/follows/status/${userId}`),
+  followRequests: () => get<FollowRequest[]>("/api/follows/requests"),
+  approveRequest: (followerId: string) =>
+    postJson<{ ok: true }>(`/api/follows/requests/${followerId}/approve`, {}),
+  declineRequest: (followerId: string) =>
+    postJson<{ ok: true }>(`/api/follows/requests/${followerId}/decline`, {}),
+  updateMe: (patch: { displayName?: string; bio?: string | null; isPrivate?: boolean }) =>
+    send<{ ok: true }>("PATCH", "/api/me", patch),
 
   // Upload uses multipart, so it bypasses the JSON helper.
   async upload(form: FormData): Promise<{ id: string }> {

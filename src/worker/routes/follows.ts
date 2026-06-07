@@ -52,6 +52,61 @@ route.delete("/:userId", async (c) => {
   return c.json({ ok: true });
 });
 
+// Incoming pending follow requests for the caller (private account owner),
+// joined to the requester's profile for display.
+route.get("/requests", async (c) => {
+  const me = c.get("user");
+  const db = getDb(c.env);
+  const rows = await db
+    .select({
+      followerId: follows.followerId,
+      handle: users.handle,
+      displayName: users.displayName,
+      createdAt: follows.createdAt,
+    })
+    .from(follows)
+    .innerJoin(users, eq(users.id, follows.followerId))
+    .where(and(eq(follows.followingId, me.id), eq(follows.status, "pending")))
+    .all();
+  return c.json(rows);
+});
+
+// Approve a pending request.
+route.post("/requests/:followerId/approve", async (c) => {
+  const me = c.get("user");
+  const db = getDb(c.env);
+  const followerId = c.req.param("followerId");
+  const rel = await db
+    .select()
+    .from(follows)
+    .where(and(eq(follows.followerId, followerId), eq(follows.followingId, me.id)))
+    .get();
+  if (!rel || rel.status !== "pending") return c.json({ error: "not found" }, 404);
+
+  await db
+    .update(follows)
+    .set({ status: "accepted" })
+    .where(and(eq(follows.followerId, followerId), eq(follows.followingId, me.id)));
+  return c.json({ ok: true });
+});
+
+// Decline (delete) a pending request.
+route.post("/requests/:followerId/decline", async (c) => {
+  const me = c.get("user");
+  const db = getDb(c.env);
+  const followerId = c.req.param("followerId");
+  await db
+    .delete(follows)
+    .where(
+      and(
+        eq(follows.followerId, followerId),
+        eq(follows.followingId, me.id),
+        eq(follows.status, "pending")
+      )
+    );
+  return c.json({ ok: true });
+});
+
 // The relationship state between the caller and another user, for rendering the
 // right follow button.
 route.get("/status/:userId", async (c) => {
