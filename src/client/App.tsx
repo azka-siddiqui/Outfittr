@@ -8,6 +8,7 @@ import { Compare } from "./pages/Compare";
 import { Leaderboard } from "./pages/Leaderboard";
 import { GuidedRanking } from "./pages/GuidedRanking";
 import { Requests } from "./pages/Requests";
+import { Feed } from "./pages/Feed";
 import type { UserProfile } from "../shared/types";
 
 // App shell: loads the signed-in profile, then renders the routed views with a
@@ -38,7 +39,8 @@ export function App() {
 
         <main className="content">
           <Routes>
-            <Route path="/" element={<Navigate to="/closet" replace />} />
+            <Route path="/" element={<Navigate to="/feed" replace />} />
+            <Route path="/feed" element={<Feed />} />
             <Route path="/closet" element={<Closet />} />
             <Route path="/upload" element={<Upload />} />
             <Route path="/outfit/:id" element={<OutfitDetail />} />
@@ -46,14 +48,14 @@ export function App() {
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/guided" element={<GuidedRanking />} />
             <Route path="/requests" element={<Requests />} />
-            <Route path="*" element={<Navigate to="/closet" replace />} />
+            <Route path="*" element={<Navigate to="/feed" replace />} />
           </Routes>
         </main>
 
         <nav className="tabbar">
+          <NavLink to="/feed">Feed</NavLink>
           <NavLink to="/closet">Closet</NavLink>
           <NavLink to="/rank">Rank</NavLink>
-          <NavLink to="/leaderboard">Ranks</NavLink>
           <NavLink to="/upload">Upload</NavLink>
         </nav>
       </div>

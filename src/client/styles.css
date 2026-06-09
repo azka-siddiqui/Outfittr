@@ -433,3 +433,31 @@ button.danger {
   font-size: 0.85rem;
   width: auto;
 }
+
+
+/* feed */
+.feed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.feed-card {
+  display: block;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface);
+  text-decoration: none;
+  color: inherit;
+}
+
+.feed-card img {
+  width: 100%;
+  display: block;
+}
+
+.feed-caption {
+  margin: 0;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+}

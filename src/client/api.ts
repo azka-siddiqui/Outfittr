@@ -68,6 +68,9 @@ export const api = {
       `/api/rankings/leaderboard/${dimension}`
     ),
 
+  followingFeed: () => get<Outfit[]>("/api/feed/following"),
+  trendingFeed: () => get<Outfit[]>("/api/feed/trending"),
+
   follow: (userId: string) => postJson<{ status: FollowStatus }>(`/api/follows/${userId}`, {}),
   unfollow: (userId: string) => send<{ ok: true }>("DELETE", `/api/follows/${userId}`),
   followStatus: (userId: string) =>
