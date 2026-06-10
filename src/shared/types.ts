@@ -53,6 +53,23 @@ export interface OutfitDetail extends Outfit {
   garments: Garment[];
 }
 
+export interface Engagement {
+  likes: number;
+  liked: boolean;
+  saved: boolean;
+  hype: string | null;
+}
+
+export interface Comment {
+  id: string;
+  body: string;
+  createdAt: number;
+  userId: string;
+  handle: string;
+}
+
+export const HYPE_EMOJIS = ["🔥", "😍", "👑", "✨"] as const;
+
 export type FollowStatus = "none" | "pending" | "accepted";
 
 export interface FollowRequest {

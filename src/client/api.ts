@@ -7,6 +7,8 @@ import type {
   Dimension,
   FollowStatus,
   FollowRequest,
+  Engagement,
+  Comment,
 } from "../shared/types";
 
 // Thin fetch wrapper. All API routes are same-origin and rely on the Access
@@ -70,6 +72,19 @@ export const api = {
 
   followingFeed: () => get<Outfit[]>("/api/feed/following"),
   trendingFeed: () => get<Outfit[]>("/api/feed/trending"),
+
+  engagement: (outfitId: string) => get<Engagement>(`/api/engage/${outfitId}`),
+  toggleLike: (outfitId: string) =>
+    postJson<{ liked: boolean }>(`/api/engage/${outfitId}/like`, {}),
+  toggleSave: (outfitId: string) =>
+    postJson<{ saved: boolean }>(`/api/engage/${outfitId}/save`, {}),
+  setHype: (outfitId: string, emoji: string) =>
+    postJson<{ hype: string | null }>(`/api/engage/${outfitId}/hype`, { emoji }),
+  comments: (outfitId: string) => get<Comment[]>(`/api/engage/${outfitId}/comments`),
+  addComment: (outfitId: string, body: string) =>
+    postJson<Comment>(`/api/engage/${outfitId}/comments`, { body }),
+  deleteComment: (id: string) => send<{ ok: true }>("DELETE", `/api/engage/comments/${id}`),
+  savedOutfits: () => get<Outfit[]>("/api/engage/saved/list"),
 
   follow: (userId: string) => postJson<{ status: FollowStatus }>(`/api/follows/${userId}`, {}),
   unfollow: (userId: string) => send<{ ok: true }>("DELETE", `/api/follows/${userId}`),

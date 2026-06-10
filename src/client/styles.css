@@ -461,3 +461,79 @@ button.danger {
   padding: 10px 12px;
   font-size: 0.9rem;
 }
+
+
+/* engagement */
+.engagement {
+  margin-top: 16px;
+}
+
+.engage-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.engage {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--fg);
+  padding: 8px 14px;
+  width: auto;
+  font-size: 0.85rem;
+}
+
+.engage.on {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.hypes {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.hype-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  padding: 6px 8px;
+  width: auto;
+  font-size: 1rem;
+  opacity: 0.6;
+}
+
+.hype-btn.on {
+  opacity: 1;
+  border-color: var(--accent);
+}
+
+.comments {
+  margin-top: 14px;
+}
+
+.comment {
+  font-size: 0.9rem;
+  padding: 5px 0;
+}
+
+.c-handle {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.comment-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.comment-form input {
+  flex: 1;
+}
+
+.comment-form button {
+  width: auto;
+  padding: 8px 14px;
+}

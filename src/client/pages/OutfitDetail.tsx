@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
 import { outfitImageUrl, type OutfitDetail as Detail, type Garment } from "../../shared/types";
+import { EngagementBar } from "../components/EngagementBar";
 
 function priceLabel(cents: number | null): string {
   return cents == null ? "" : `$${(cents / 100).toFixed(0)}`;
@@ -151,6 +152,8 @@ export function OutfitDetail() {
       )}
 
       {detail.caption && <p className="caption">{detail.caption}</p>}
+
+      <EngagementBar outfitId={detail.id} />
     </section>
   );
 }

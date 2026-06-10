@@ -119,6 +119,80 @@ export const follows = sqliteTable(
 
 export type Follow = typeof follows.$inferSelect;
 
+// Engagement on outfits. Likes and saves are simple per-user toggles; a "hype"
+// is a lightweight emoji reaction (one active reaction per user per outfit).
+export const likes = sqliteTable(
+  "likes",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    outfitId: text("outfit_id")
+      .notNull()
+      .references(() => outfits.id, { onDelete: "cascade" }),
+    createdAt: integer("created_at").notNull(),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.userId, t.outfitId] }),
+    outfitIdx: index("likes_outfit_idx").on(t.outfitId),
+  })
+);
+
+export const saves = sqliteTable(
+  "saves",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    outfitId: text("outfit_id")
+      .notNull()
+      .references(() => outfits.id, { onDelete: "cascade" }),
+    createdAt: integer("created_at").notNull(),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.userId, t.outfitId] }),
+    userIdx: index("saves_user_idx").on(t.userId),
+  })
+);
+
+export const hypes = sqliteTable(
+  "hypes",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    outfitId: text("outfit_id")
+      .notNull()
+      .references(() => outfits.id, { onDelete: "cascade" }),
+    emoji: text("emoji").notNull(),
+    createdAt: integer("created_at").notNull(),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.userId, t.outfitId] }),
+    outfitIdx: index("hypes_outfit_idx").on(t.outfitId),
+  })
+);
+
+export const comments = sqliteTable(
+  "comments",
+  {
+    id: text("id").primaryKey(),
+    outfitId: text("outfit_id")
+      .notNull()
+      .references(() => outfits.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    body: text("body").notNull(),
+    createdAt: integer("created_at").notNull(),
+  },
+  (t) => ({
+    outfitIdx: index("comments_outfit_idx").on(t.outfitId),
+  })
+);
+
+export type Comment = typeof comments.$inferSelect;
+
 // Records every head-to-head comparison so ratings are auditable and we can
 // avoid showing the same pair repeatedly. `dimension` is the leaderboard the
 // match counted toward.
