@@ -9,6 +9,8 @@ import type {
   FollowRequest,
   Engagement,
   Comment,
+  ProfileView,
+  UserSummary,
 } from "../shared/types";
 
 // Thin fetch wrapper. All API routes are same-origin and rely on the Access
@@ -97,6 +99,9 @@ export const api = {
     postJson<{ ok: true }>(`/api/follows/requests/${followerId}/decline`, {}),
   updateMe: (patch: { displayName?: string; bio?: string | null; isPrivate?: boolean }) =>
     send<{ ok: true }>("PATCH", "/api/me", patch),
+  profile: (handle: string) => get<ProfileView>(`/api/users/${handle}`),
+  followers: (userId: string) => get<UserSummary[]>(`/api/follows/${userId}/followers`),
+  following: (userId: string) => get<UserSummary[]>(`/api/follows/${userId}/following`),
 
   // Upload uses multipart, so it bypasses the JSON helper.
   async upload(form: FormData): Promise<{ id: string }> {

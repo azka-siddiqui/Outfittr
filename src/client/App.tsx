@@ -9,6 +9,7 @@ import { Leaderboard } from "./pages/Leaderboard";
 import { GuidedRanking } from "./pages/GuidedRanking";
 import { Requests } from "./pages/Requests";
 import { Feed } from "./pages/Feed";
+import { Profile } from "./pages/Profile";
 import type { UserProfile } from "../shared/types";
 
 // App shell: loads the signed-in profile, then renders the routed views with a
@@ -34,7 +35,11 @@ export function App() {
       <div className="shell">
         <header className="topbar">
           <span className="logo">Outfittr</span>
-          {me && <span className="handle">@{me.handle}</span>}
+          {me && (
+            <a className="handle" href={`#/u/${me.handle}`}>
+              @{me.handle}
+            </a>
+          )}
         </header>
 
         <main className="content">
@@ -48,6 +53,7 @@ export function App() {
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/guided" element={<GuidedRanking />} />
             <Route path="/requests" element={<Requests />} />
+            <Route path="/u/:handle" element={<Profile />} />
             <Route path="*" element={<Navigate to="/feed" replace />} />
           </Routes>
         </main>

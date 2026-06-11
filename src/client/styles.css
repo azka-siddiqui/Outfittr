@@ -537,3 +537,68 @@ button.danger {
   width: auto;
   padding: 8px 14px;
 }
+
+
+/* profile */
+.handle {
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.profile-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.profile-head button {
+  width: auto;
+  padding: 8px 16px;
+  white-space: nowrap;
+}
+
+.bio {
+  font-size: 0.9rem;
+  margin: 6px 0 0;
+}
+
+.profile-stats {
+  display: flex;
+  gap: 20px;
+  margin: 14px 0;
+}
+
+.stat-btn {
+  background: transparent;
+  border: none;
+  color: var(--fg);
+  padding: 0;
+  width: auto;
+  font-size: 0.9rem;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.user-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+}
+
+.user-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.user-list a {
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.locked {
+  text-align: center;
+  padding: 24px 0;
+}

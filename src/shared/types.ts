@@ -79,6 +79,26 @@ export interface FollowRequest {
   createdAt: number;
 }
 
+export interface ProfileView {
+  id: string;
+  handle: string;
+  displayName: string;
+  bio: string | null;
+  isPrivate: boolean;
+  isSelf: boolean;
+  followStatus: FollowStatus;
+  followers: number;
+  following: number;
+  canView: boolean;
+  outfits: Outfit[];
+}
+
+export interface UserSummary {
+  id: string;
+  handle: string;
+  displayName: string;
+}
+
 export type Dimension = "overall" | "aesthetic" | "occasion";
 
 export const DIMENSION_LABELS: Record<Dimension, string> = {

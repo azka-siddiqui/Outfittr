@@ -107,6 +107,30 @@ route.post("/requests/:followerId/decline", async (c) => {
   return c.json({ ok: true });
 });
 
+// Accepted followers of a user (people who follow them).
+route.get("/:userId/followers", async (c) => {
+  const db = getDb(c.env);
+  const rows = await db
+    .select({ id: users.id, handle: users.handle, displayName: users.displayName })
+    .from(follows)
+    .innerJoin(users, eq(users.id, follows.followerId))
+    .where(and(eq(follows.followingId, c.req.param("userId")), eq(follows.status, "accepted")))
+    .all();
+  return c.json(rows);
+});
+
+// Accounts a user follows.
+route.get("/:userId/following", async (c) => {
+  const db = getDb(c.env);
+  const rows = await db
+    .select({ id: users.id, handle: users.handle, displayName: users.displayName })
+    .from(follows)
+    .innerJoin(users, eq(users.id, follows.followingId))
+    .where(and(eq(follows.followerId, c.req.param("userId")), eq(follows.status, "accepted")))
+    .all();
+  return c.json(rows);
+});
+
 // The relationship state between the caller and another user, for rendering the
 // right follow button.
 route.get("/status/:userId", async (c) => {
