@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { api } from "../api";
-import { outfitImageUrl, type ProfileView, type UserSummary } from "../../shared/types";
+import {
+  outfitImageUrl,
+  type ProfileView,
+  type UserSummary,
+  type Compatibility,
+} from "../../shared/types";
 
 // A user's profile: header with counts + follow button, their outfit grid (when
 // visible), and expandable followers/following lists.
@@ -11,9 +16,18 @@ export function Profile() {
   const [list, setList] = useState<{ kind: "followers" | "following"; users: UserSummary[] } | null>(
     null
   );
+  const [compat, setCompat] = useState<Compatibility | null>(null);
 
   const load = useCallback(() => {
     api.profile(handle).then(setProfile).catch(() => setProfile(null));
+  }, [handle]);
+
+  useEffect(() => {
+    // Compatibility is only meaningful for other people's profiles.
+    api
+      .compatibility(handle)
+      .then(setCompat)
+      .catch(() => setCompat(null));
   }, [handle]);
 
   useEffect(() => {
@@ -69,6 +83,17 @@ export function Profile() {
           </button>
         )}
       </header>
+
+      {!profile.isSelf && compat && (
+        <div className="compat">
+          <span className="compat-score">{compat.score}%</span>
+          <span className="compat-label">
+            style match
+            {compat.sharedAesthetics.length > 0 &&
+              ` · ${compat.sharedAesthetics.slice(0, 3).join(", ")}`}
+          </span>
+        </div>
+      )}
 
       <div className="profile-stats">
         <button className="stat-btn" onClick={() => showList("followers")}>

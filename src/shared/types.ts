@@ -99,6 +99,12 @@ export interface UserSummary {
   displayName: string;
 }
 
+export interface Compatibility {
+  score: number;
+  sharedBrands: string[];
+  sharedAesthetics: string[];
+}
+
 export type Dimension = "overall" | "aesthetic" | "occasion";
 
 export const DIMENSION_LABELS: Record<Dimension, string> = {

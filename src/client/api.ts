@@ -11,6 +11,7 @@ import type {
   Comment,
   ProfileView,
   UserSummary,
+  Compatibility,
 } from "../shared/types";
 
 // Thin fetch wrapper. All API routes are same-origin and rely on the Access
@@ -102,6 +103,7 @@ export const api = {
   profile: (handle: string) => get<ProfileView>(`/api/users/${handle}`),
   followers: (userId: string) => get<UserSummary[]>(`/api/follows/${userId}/followers`),
   following: (userId: string) => get<UserSummary[]>(`/api/follows/${userId}/following`),
+  compatibility: (handle: string) => get<Compatibility>(`/api/users/${handle}/compatibility`),
 
   // Upload uses multipart, so it bypasses the JSON helper.
   async upload(form: FormData): Promise<{ id: string }> {
