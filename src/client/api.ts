@@ -12,6 +12,7 @@ import type {
   ProfileView,
   UserSummary,
   Compatibility,
+  MetadataSuggestion,
 } from "../shared/types";
 
 // Thin fetch wrapper. All API routes are same-origin and rely on the Access
@@ -110,5 +111,13 @@ export const api = {
     const res = await fetch("/api/outfits", { method: "POST", body: form });
     if (!res.ok) throw new Error(`${res.status}`);
     return res.json() as Promise<{ id: string }>;
+  },
+
+  async suggestMetadata(file: File): Promise<MetadataSuggestion> {
+    const form = new FormData();
+    form.set("photo", file);
+    const res = await fetch("/api/outfits/suggest", { method: "POST", body: form });
+    if (!res.ok) throw new Error(`${res.status}`);
+    return res.json() as Promise<MetadataSuggestion>;
   },
 };

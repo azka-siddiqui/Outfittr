@@ -9,7 +9,27 @@ export function Upload() {
   const [aesthetic, setAesthetic] = useState("");
   const [occasion, setOccasion] = useState("");
   const [busy, setBusy] = useState(false);
+  const [suggesting, setSuggesting] = useState(false);
+  const [suggestedGarments, setSuggestedGarments] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  // On file select, ask the backend to suggest metadata and pre-fill the form.
+  async function onFile(f: File | null) {
+    setFile(f);
+    setSuggestedGarments([]);
+    if (!f) return;
+    setSuggesting(true);
+    try {
+      const s = await api.suggestMetadata(f);
+      if (s.aesthetic) setAesthetic(s.aesthetic);
+      if (s.occasion) setOccasion(s.occasion);
+      setSuggestedGarments(s.garments);
+    } catch {
+      // Suggestion is best-effort; ignore failures.
+    } finally {
+      setSuggesting(false);
+    }
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -39,8 +59,12 @@ export function Upload() {
         <input
           type="file"
           accept="image/jpeg,image/png,image/webp"
-          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+          onChange={(e) => onFile(e.target.files?.[0] ?? null)}
         />
+        {suggesting && <p className="muted">Analyzing photo…</p>}
+        {suggestedGarments.length > 0 && (
+          <p className="muted">Detected: {suggestedGarments.join(", ")}</p>
+        )}
         <input
           placeholder="Caption (optional)"
           value={caption}

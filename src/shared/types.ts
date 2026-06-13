@@ -105,6 +105,13 @@ export interface Compatibility {
   sharedAesthetics: string[];
 }
 
+export interface MetadataSuggestion {
+  aesthetic: string | null;
+  occasion: string | null;
+  garments: string[];
+  source: "ai" | "fallback";
+}
+
 export type Dimension = "overall" | "aesthetic" | "occasion";
 
 export const DIMENSION_LABELS: Record<Dimension, string> = {

@@ -8,6 +8,7 @@ import type { Outfit } from "../db/schema";
 import { newId, now } from "../lib/id";
 import { isAllowedImage, photoKey } from "../lib/media";
 import { canViewUser } from "../lib/visibility";
+import { suggestMetadata } from "../lib/suggest";
 
 const route = new Hono<{ Bindings: Env; Variables: AuthVars }>();
 
@@ -50,6 +51,19 @@ route.get("/facets", async (c) => {
   const aesthetics = [...new Set(rows.map((r) => r.aesthetic).filter(Boolean))] as string[];
   const occasions = [...new Set(rows.map((r) => r.occasion).filter(Boolean))] as string[];
   return c.json({ aesthetics: aesthetics.sort(), occasions: occasions.sort() });
+});
+
+// Analyze a photo and suggest metadata (aesthetic, occasion, garments) without
+// saving anything. The client calls this to pre-fill the upload form.
+route.post("/suggest", async (c) => {
+  const form = await c.req.formData();
+  const photo = form.get("photo");
+  if (!(photo instanceof File)) {
+    return c.json({ error: "photo file is required" }, 400);
+  }
+  const bytes = new Uint8Array(await photo.arrayBuffer());
+  const suggestion = await suggestMetadata(c.env, bytes);
+  return c.json(suggestion);
 });
 
 // Create an outfit: multipart upload with the photo plus optional metadata.
