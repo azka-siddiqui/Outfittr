@@ -56,6 +56,7 @@ export const api = {
     patch: { caption?: string | null; aesthetic?: string | null; occasion?: string | null }
   ) => send<{ ok: true }>("PATCH", `/api/outfits/${id}`, patch),
   deleteOutfit: (id: string) => send<{ ok: true }>("DELETE", `/api/outfits/${id}`),
+  createCutout: (id: string) => postJson<{ cutout: boolean }>(`/api/outfits/${id}/cutout`, {}),
   addGarment: (outfitId: string, g: Partial<Garment> & { name: string }) =>
     postJson<Garment>(`/api/garments/outfit/${outfitId}`, g),
   updateGarment: (id: string, g: Partial<Garment>) =>

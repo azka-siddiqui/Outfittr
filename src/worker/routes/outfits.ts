@@ -6,9 +6,10 @@ import { getDb } from "../db";
 import { outfits, collections, garments } from "../db/schema";
 import type { Outfit } from "../db/schema";
 import { newId, now } from "../lib/id";
-import { isAllowedImage, photoKey } from "../lib/media";
+import { isAllowedImage, photoKey, cutoutKey } from "../lib/media";
 import { canViewUser } from "../lib/visibility";
 import { suggestMetadata } from "../lib/suggest";
+import { generateCutout } from "../lib/cutout";
 
 const route = new Hono<{ Bindings: Env; Variables: AuthVars }>();
 
@@ -186,6 +187,36 @@ route.delete("/:id", async (c) => {
   await db.delete(outfits).where(eq(outfits.id, outfit.id));
 
   return c.json({ ok: true });
+});
+
+// Generate an AI cutout (background removed) for an outfit the caller owns and
+// store it in R2. Returns whether a cutout is now available.
+route.post("/:id/cutout", async (c) => {
+  const user = c.get("user");
+  const db = getDb(c.env);
+  const outfit = await db
+    .select()
+    .from(outfits)
+    .where(eq(outfits.id, c.req.param("id")))
+    .get();
+  if (!outfit || outfit.userId !== user.id) {
+    return c.json({ error: "not found" }, 404);
+  }
+
+  const original = await c.env.MEDIA.get(outfit.photoKey);
+  if (!original) return c.json({ error: "photo missing" }, 404);
+
+  const bytes = new Uint8Array(await original.arrayBuffer());
+  const cutout = await generateCutout(c.env, bytes);
+  if (!cutout) {
+    return c.json({ error: "cutouts unavailable", cutout: false }, 503);
+  }
+
+  const key = cutoutKey(user.id, outfit.id);
+  await c.env.MEDIA.put(key, cutout, { httpMetadata: { contentType: "image/png" } });
+  await db.update(outfits).set({ cutoutKey: key }).where(eq(outfits.id, outfit.id));
+
+  return c.json({ cutout: true });
 });
 
 // Move an outfit into a collection (or out of one with collectionId: null).

@@ -19,6 +19,8 @@ export function OutfitDetail() {
   const [draft, setDraft] = useState<{ x: number; y: number } | null>(null);
   const [name, setName] = useState("");
   const [editing, setEditing] = useState(false);
+  const [showCutout, setShowCutout] = useState(false);
+  const [cutoutBusy, setCutoutBusy] = useState(false);
   const imgWrap = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -72,10 +74,28 @@ export function OutfitDetail() {
     navigate("/closet");
   }
 
+  async function makeCutout() {
+    setCutoutBusy(true);
+    try {
+      const { cutout } = await api.createCutout(id);
+      if (cutout) {
+        setDetail((d) => (d ? { ...d, cutoutKey: "generated" } : d));
+        setShowCutout(true);
+      } else {
+        alert("Cutouts aren't available right now.");
+      }
+    } finally {
+      setCutoutBusy(false);
+    }
+  }
+
   return (
     <section className="detail">
       <div className="photo-wrap" ref={imgWrap} onClick={onPhotoClick}>
-        <img src={outfitImageUrl(detail.id)} alt={detail.caption ?? "outfit"} />
+        <img
+          src={outfitImageUrl(detail.id, showCutout ? "cutout" : undefined)}
+          alt={detail.caption ?? "outfit"}
+        />
 
         {showPins &&
           detail.garments
@@ -112,6 +132,15 @@ export function OutfitDetail() {
         </button>
         {owner && (
           <>
+            {detail.cutoutKey ? (
+              <button className="ghost" onClick={() => setShowCutout((s) => !s)}>
+                {showCutout ? "Show photo" : "Show cutout"}
+              </button>
+            ) : (
+              <button className="ghost" onClick={makeCutout} disabled={cutoutBusy}>
+                {cutoutBusy ? "Cutting out…" : "Create cutout"}
+              </button>
+            )}
             <button className="ghost" onClick={() => setEditing((e) => !e)}>
               Edit
             </button>
