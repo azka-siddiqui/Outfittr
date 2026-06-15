@@ -13,6 +13,7 @@ import type {
   UserSummary,
   Compatibility,
   MetadataSuggestion,
+  StyleDna,
 } from "../shared/types";
 
 // Thin fetch wrapper. All API routes are same-origin and rely on the Access
@@ -106,6 +107,7 @@ export const api = {
   followers: (userId: string) => get<UserSummary[]>(`/api/follows/${userId}/followers`),
   following: (userId: string) => get<UserSummary[]>(`/api/follows/${userId}/following`),
   compatibility: (handle: string) => get<Compatibility>(`/api/users/${handle}/compatibility`),
+  styleDna: () => get<StyleDna>("/api/intelligence/style-dna"),
 
   // Upload uses multipart, so it bypasses the JSON helper.
   async upload(form: FormData): Promise<{ id: string }> {

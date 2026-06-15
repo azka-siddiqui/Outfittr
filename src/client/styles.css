@@ -626,3 +626,74 @@ button.danger {
   font-size: 0.85rem;
   color: var(--muted);
 }
+
+
+/* style dna */
+.dna-summary {
+  font-size: 1.05rem;
+  line-height: 1.4;
+}
+
+.dna-block {
+  margin-top: 20px;
+}
+
+.dna-block h3 {
+  font-size: 0.95rem;
+  margin: 0 0 8px;
+}
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+}
+
+.bar-label {
+  width: 90px;
+  flex: none;
+}
+
+.bar {
+  flex: 1;
+  height: 8px;
+  background: var(--surface);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: var(--accent);
+}
+
+.bar-fill.alt {
+  background: #6cc4e8;
+}
+
+.bar-pct {
+  width: 38px;
+  text-align: right;
+  color: var(--muted);
+}
+
+.brand-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.brand-tag {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+.brand-tag em {
+  color: var(--muted);
+  font-style: normal;
+}

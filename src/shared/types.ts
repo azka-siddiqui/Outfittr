@@ -105,6 +105,14 @@ export interface Compatibility {
   sharedAesthetics: string[];
 }
 
+export interface StyleDna {
+  outfitCount: number;
+  favoriteBrands: { brand: string; count: number }[];
+  aesthetics: { aesthetic: string; percent: number }[];
+  occasions: { occasion: string; percent: number }[];
+  summary: string;
+}
+
 export interface MetadataSuggestion {
   aesthetic: string | null;
   occasion: string | null;
