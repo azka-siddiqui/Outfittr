@@ -11,6 +11,7 @@ import { Requests } from "./pages/Requests";
 import { Feed } from "./pages/Feed";
 import { Profile } from "./pages/Profile";
 import { StyleDna } from "./pages/StyleDna";
+import { Stylist } from "./pages/Stylist";
 import type { UserProfile } from "../shared/types";
 
 // App shell: loads the signed-in profile, then renders the routed views with a
@@ -56,6 +57,7 @@ export function App() {
             <Route path="/requests" element={<Requests />} />
             <Route path="/u/:handle" element={<Profile />} />
             <Route path="/style-dna" element={<StyleDna />} />
+            <Route path="/stylist" element={<Stylist />} />
             <Route path="*" element={<Navigate to="/feed" replace />} />
           </Routes>
         </main>

@@ -108,6 +108,11 @@ export const api = {
   following: (userId: string) => get<UserSummary[]>(`/api/follows/${userId}/following`),
   compatibility: (handle: string) => get<Compatibility>(`/api/users/${handle}/compatibility`),
   styleDna: () => get<StyleDna>("/api/intelligence/style-dna"),
+  askStylist: (question: string) =>
+    postJson<{ answer: string; source: "ai" | "fallback" }>(
+      "/api/intelligence/stylist",
+      { question }
+    ),
 
   // Upload uses multipart, so it bypasses the JSON helper.
   async upload(form: FormData): Promise<{ id: string }> {

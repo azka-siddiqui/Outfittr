@@ -84,6 +84,20 @@ export function Profile() {
         )}
       </header>
 
+      {profile.isSelf && (
+        <div className="self-links">
+          <a className="chip" href="#/style-dna">
+            Style DNA
+          </a>
+          <a className="chip" href="#/stylist">
+            Ask stylist
+          </a>
+          <a className="chip" href="#/requests">
+            Requests
+          </a>
+        </div>
+      )}
+
       {!profile.isSelf && compat && (
         <div className="compat">
           <span className="compat-score">{compat.score}%</span>

@@ -697,3 +697,56 @@ button.danger {
   color: var(--muted);
   font-style: normal;
 }
+
+
+/* stylist chat */
+.chat {
+  margin: 12px 0;
+}
+
+.turn {
+  margin-bottom: 14px;
+}
+
+.turn .q {
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+.turn .a {
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--surface);
+  border-radius: 10px;
+  border-left: 3px solid var(--accent);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.ask-form {
+  display: flex;
+  gap: 8px;
+  position: sticky;
+  bottom: 8px;
+}
+
+.ask-form input {
+  flex: 1;
+}
+
+.ask-form button {
+  width: auto;
+  padding: 10px 16px;
+}
+
+
+.self-links {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+
+.self-links .chip {
+  text-decoration: none;
+}
