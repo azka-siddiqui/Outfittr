@@ -10,6 +10,7 @@ import usersRoute from "./routes/users";
 import feed from "./routes/feed";
 import engagement from "./routes/engagement";
 import intelligence from "./routes/intelligence";
+import search from "./routes/search";
 import media from "./routes/media";
 
 // One Worker serves both the API and the React app. Hono owns /api/*; anything
@@ -28,6 +29,7 @@ app.route("/api/users", usersRoute);
 app.route("/api/feed", feed);
 app.route("/api/engage", engagement);
 app.route("/api/intelligence", intelligence);
+app.route("/api/search", search);
 app.route("/api/media", media);
 
 // Fall through to the SPA for all non-API routes.

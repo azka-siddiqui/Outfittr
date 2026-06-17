@@ -750,3 +750,20 @@ button.danger {
 .self-links .chip {
   text-decoration: none;
 }
+
+
+/* search */
+.search-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.search-bar input {
+  flex: 1;
+}
+
+.search-bar button {
+  width: auto;
+  padding: 10px 16px;
+}

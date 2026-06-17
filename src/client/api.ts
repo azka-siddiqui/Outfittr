@@ -107,6 +107,10 @@ export const api = {
   followers: (userId: string) => get<UserSummary[]>(`/api/follows/${userId}/followers`),
   following: (userId: string) => get<UserSummary[]>(`/api/follows/${userId}/following`),
   compatibility: (handle: string) => get<Compatibility>(`/api/users/${handle}/compatibility`),
+  search: (q: string, scope: "world" | "following" | "closet") =>
+    get<{ people: UserSummary[]; outfits: Outfit[] }>(
+      `/api/search?q=${encodeURIComponent(q)}&scope=${scope}`
+    ),
   styleDna: () => get<StyleDna>("/api/intelligence/style-dna"),
   askStylist: (question: string) =>
     postJson<{ answer: string; source: "ai" | "fallback" }>(

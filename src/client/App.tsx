@@ -12,6 +12,7 @@ import { Feed } from "./pages/Feed";
 import { Profile } from "./pages/Profile";
 import { StyleDna } from "./pages/StyleDna";
 import { Stylist } from "./pages/Stylist";
+import { Search } from "./pages/Search";
 import type { UserProfile } from "../shared/types";
 
 // App shell: loads the signed-in profile, then renders the routed views with a
@@ -58,12 +59,14 @@ export function App() {
             <Route path="/u/:handle" element={<Profile />} />
             <Route path="/style-dna" element={<StyleDna />} />
             <Route path="/stylist" element={<Stylist />} />
+            <Route path="/search" element={<Search />} />
             <Route path="*" element={<Navigate to="/feed" replace />} />
           </Routes>
         </main>
 
         <nav className="tabbar">
           <NavLink to="/feed">Feed</NavLink>
+          <NavLink to="/search">Search</NavLink>
           <NavLink to="/closet">Closet</NavLink>
           <NavLink to="/rank">Rank</NavLink>
           <NavLink to="/upload">Upload</NavLink>

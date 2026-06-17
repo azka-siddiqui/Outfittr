@@ -79,7 +79,7 @@ route.get("/:handle/compatibility", async (c) => {
     return c.json({ score: 100, sharedBrands: [], sharedAesthetics: [] });
   }
 
-  const result = await computeCompatibility(db, me.id, other.id);
+  const result = await computeCompatibility(db, c.env, me.id, other.id);
   return c.json(result);
 });
 

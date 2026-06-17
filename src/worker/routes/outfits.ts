@@ -10,6 +10,7 @@ import { isAllowedImage, photoKey, cutoutKey } from "../lib/media";
 import { canViewUser } from "../lib/visibility";
 import { suggestMetadata } from "../lib/suggest";
 import { generateCutout } from "../lib/cutout";
+import { indexOutfit, deindexOutfit } from "../lib/search";
 
 const route = new Hono<{ Bindings: Env; Variables: AuthVars }>();
 
@@ -109,6 +110,9 @@ route.post("/", async (c) => {
   };
   await db.insert(outfits).values(outfit);
 
+  // Index for semantic search (best-effort; won't fail the upload).
+  await indexOutfit(c.env, db, outfit.id, user.id);
+
   return c.json({ id: outfit.id }, 201);
 });
 
@@ -185,6 +189,7 @@ route.delete("/:id", async (c) => {
   const keys = [outfit.photoKey, outfit.cutoutKey].filter(Boolean) as string[];
   await Promise.all(keys.map((k) => c.env.MEDIA.delete(k)));
   await db.delete(outfits).where(eq(outfits.id, outfit.id));
+  await deindexOutfit(c.env, outfit.id);
 
   return c.json({ ok: true });
 });
