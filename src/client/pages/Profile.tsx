@@ -92,6 +92,9 @@ export function Profile() {
           <a className="chip" href="#/stylist">
             Ask stylist
           </a>
+          <a className="chip" href="#/challenges">
+            Challenges
+          </a>
           <a className="chip" href="#/requests">
             Requests
           </a>

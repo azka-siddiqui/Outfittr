@@ -14,6 +14,8 @@ import type {
   Compatibility,
   MetadataSuggestion,
   StyleDna,
+  Challenge,
+  ChallengeDetail,
 } from "../shared/types";
 
 // Thin fetch wrapper. All API routes are same-origin and rely on the Access
@@ -111,6 +113,17 @@ export const api = {
     get<{ people: UserSummary[]; outfits: Outfit[] }>(
       `/api/search?q=${encodeURIComponent(q)}&scope=${scope}`
     ),
+  challenges: () => get<Challenge[]>("/api/challenges"),
+  challenge: (id: string) => get<ChallengeDetail>(`/api/challenges/${id}`),
+  createChallenge: (input: {
+    title: string;
+    description?: string;
+    aesthetic?: string;
+    durationDays?: number;
+  }) => postJson<Challenge>("/api/challenges", input),
+  enterChallenge: (id: string, outfitId: string) =>
+    postJson<{ ok: boolean }>(`/api/challenges/${id}/enter`, { outfitId }),
+
   styleDna: () => get<StyleDna>("/api/intelligence/style-dna"),
   askStylist: (question: string) =>
     postJson<{ answer: string; source: "ai" | "fallback" }>(

@@ -105,6 +105,29 @@ export interface Compatibility {
   sharedAesthetics: string[];
 }
 
+export interface Challenge {
+  id: string;
+  title: string;
+  description: string | null;
+  type: "weekly" | "community";
+  aesthetic: string | null;
+  creatorId: string | null;
+  startsAt: number;
+  endsAt: number;
+  createdAt: number;
+}
+
+export interface ChallengeEntry {
+  id: string;
+  outfitId: string;
+  userId: string;
+  elo: number;
+}
+
+export interface ChallengeDetail extends Challenge {
+  entries: ChallengeEntry[];
+}
+
 export interface StyleDna {
   outfitCount: number;
   favoriteBrands: { brand: string; count: number }[];

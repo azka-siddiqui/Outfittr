@@ -193,6 +193,54 @@ export const comments = sqliteTable(
 
 export type Comment = typeof comments.$inferSelect;
 
+// Community challenges: weekly style prompts or user-created challenges. Each
+// entry is one outfit competing in the challenge, with its own Elo so a
+// challenge has an independent leaderboard.
+export const challenges = sqliteTable(
+  "challenges",
+  {
+    id: text("id").primaryKey(),
+    title: text("title").notNull(),
+    description: text("description"),
+    type: text("type").notNull(), // "weekly" | "community"
+    // Optional aesthetic constraint for the prompt.
+    aesthetic: text("aesthetic"),
+    creatorId: text("creator_id").references(() => users.id, { onDelete: "set null" }),
+    startsAt: integer("starts_at").notNull(),
+    endsAt: integer("ends_at").notNull(),
+    createdAt: integer("created_at").notNull(),
+  },
+  (t) => ({
+    typeIdx: index("challenges_type_idx").on(t.type),
+  })
+);
+
+export const challengeEntries = sqliteTable(
+  "challenge_entries",
+  {
+    id: text("id").primaryKey(),
+    challengeId: text("challenge_id")
+      .notNull()
+      .references(() => challenges.id, { onDelete: "cascade" }),
+    outfitId: text("outfit_id")
+      .notNull()
+      .references(() => outfits.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    elo: real("elo").notNull().default(1200),
+    createdAt: integer("created_at").notNull(),
+  },
+  (t) => ({
+    // One outfit per challenge per user.
+    pk: primaryKey({ columns: [t.challengeId, t.outfitId] }),
+    challengeIdx: index("entries_challenge_idx").on(t.challengeId),
+  })
+);
+
+export type Challenge = typeof challenges.$inferSelect;
+export type ChallengeEntry = typeof challengeEntries.$inferSelect;
+
 // Records every head-to-head comparison so ratings are auditable and we can
 // avoid showing the same pair repeatedly. `dimension` is the leaderboard the
 // match counted toward.

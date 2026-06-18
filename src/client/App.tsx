@@ -13,6 +13,8 @@ import { Profile } from "./pages/Profile";
 import { StyleDna } from "./pages/StyleDna";
 import { Stylist } from "./pages/Stylist";
 import { Search } from "./pages/Search";
+import { Challenges } from "./pages/Challenges";
+import { ChallengeDetail } from "./pages/ChallengeDetail";
 import type { UserProfile } from "../shared/types";
 
 // App shell: loads the signed-in profile, then renders the routed views with a
@@ -60,6 +62,8 @@ export function App() {
             <Route path="/style-dna" element={<StyleDna />} />
             <Route path="/stylist" element={<Stylist />} />
             <Route path="/search" element={<Search />} />
+            <Route path="/challenges" element={<Challenges />} />
+            <Route path="/challenge/:id" element={<ChallengeDetail />} />
             <Route path="*" element={<Navigate to="/feed" replace />} />
           </Routes>
         </main>

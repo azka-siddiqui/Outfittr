@@ -29,6 +29,13 @@
       "when": 1749480000000,
       "tag": "0003_engagement",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1750200000000,
+      "tag": "0004_challenges",
+      "breakpoints": true
     }
   ]
 }
