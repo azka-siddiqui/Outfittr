@@ -123,6 +123,13 @@ export const api = {
   }) => postJson<Challenge>("/api/challenges", input),
   enterChallenge: (id: string, outfitId: string) =>
     postJson<{ ok: boolean }>(`/api/challenges/${id}/enter`, { outfitId }),
+  challengePair: (id: string) =>
+    get<{ id: string; outfitId: string; elo: number }[]>(`/api/challenges/${id}/pair`),
+  challengeVote: (id: string, winnerEntryId: string, loserEntryId: string) =>
+    postJson<{ winner: number; loser: number }>(`/api/challenges/${id}/vote`, {
+      winnerEntryId,
+      loserEntryId,
+    }),
 
   styleDna: () => get<StyleDna>("/api/intelligence/style-dna"),
   askStylist: (question: string) =>

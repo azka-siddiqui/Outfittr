@@ -10,6 +10,8 @@ export function ChallengeDetail() {
   const [detail, setDetail] = useState<Detail | null>(null);
   const [myOutfits, setMyOutfits] = useState<Outfit[]>([]);
   const [picking, setPicking] = useState(false);
+  const [pair, setPair] = useState<{ id: string; outfitId: string }[] | null>(null);
+  const [voteBusy, setVoteBusy] = useState(false);
 
   const load = useCallback(() => {
     api.challenge(id).then(setDetail).catch(() => setDetail(null));
@@ -25,6 +27,22 @@ export function ChallengeDetail() {
   async function enter(outfitId: string) {
     await api.enterChallenge(id, outfitId);
     setPicking(false);
+    load();
+  }
+
+  function loadPair() {
+    api
+      .challengePair(id)
+      .then(setPair)
+      .catch(() => setPair(null));
+  }
+
+  async function vote(winner: { id: string }, loser: { id: string }) {
+    if (voteBusy) return;
+    setVoteBusy(true);
+    await api.challengeVote(id, winner.id, loser.id);
+    setVoteBusy(false);
+    loadPair();
     load();
   }
 
@@ -52,6 +70,31 @@ export function ChallengeDetail() {
               <img src={outfitImageUrl(o.id)} alt={o.caption ?? "outfit"} />
             </button>
           ))}
+        </div>
+      )}
+
+      {detail.entries.length >= 2 && (
+        <div className="challenge-vote">
+          <h3 className="section-h">Vote</h3>
+          {!pair ? (
+            <button className="ghost" onClick={loadPair}>
+              Start voting
+            </button>
+          ) : (
+            <div className="versus">
+              {pair.map((e) => (
+                <button
+                  key={e.id}
+                  className="versus-card"
+                  disabled={voteBusy}
+                  onClick={() => vote(e, pair.find((x) => x.id !== e.id)!)}
+                >
+                  <img src={outfitImageUrl(e.outfitId)} alt="entry" />
+                </button>
+              ))}
+              <div className="versus-vs">vs</div>
+            </div>
+          )}
         </div>
       )}
 

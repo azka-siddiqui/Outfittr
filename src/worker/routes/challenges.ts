@@ -6,6 +6,8 @@ import { getDb } from "../db";
 import { challenges, challengeEntries, outfits } from "../db/schema";
 import type { Challenge } from "../db/schema";
 import { newId, now } from "../lib/id";
+import { applyMatch } from "../lib/elo";
+import { sql } from "drizzle-orm";
 
 const route = new Hono<{ Bindings: Env; Variables: AuthVars }>();
 
@@ -119,6 +121,90 @@ route.post("/:id/enter", async (c) => {
     createdAt: now(),
   });
   return c.json({ ok: true }, 201);
+});
+
+// A random pair of entries to vote on within a challenge.
+route.get("/:id/pair", async (c) => {
+  const db = getDb(c.env);
+  const challengeId = c.req.param("id");
+  const pair = await db
+    .select({
+      id: challengeEntries.id,
+      outfitId: challengeEntries.outfitId,
+      elo: challengeEntries.elo,
+    })
+    .from(challengeEntries)
+    .where(eq(challengeEntries.challengeId, challengeId))
+    .orderBy(sql`RANDOM()`)
+    .limit(2)
+    .all();
+
+  if (pair.length < 2) {
+    return c.json({ error: "need at least two entries" }, 409);
+  }
+  return c.json(pair);
+});
+
+// Vote in a challenge matchup: updates the two entries' challenge Elo.
+route.post("/:id/vote", async (c) => {
+  const db = getDb(c.env);
+  const challengeId = c.req.param("id");
+  const body = await c.req.json<{ winnerEntryId: string; loserEntryId: string }>();
+  if (!body.winnerEntryId || !body.loserEntryId || body.winnerEntryId === body.loserEntryId) {
+    return c.json({ error: "winner and loser must differ" }, 400);
+  }
+
+  const winner = await db
+    .select()
+    .from(challengeEntries)
+    .where(
+      and(
+        eq(challengeEntries.id, body.winnerEntryId),
+        eq(challengeEntries.challengeId, challengeId)
+      )
+    )
+    .get();
+  const loser = await db
+    .select()
+    .from(challengeEntries)
+    .where(
+      and(
+        eq(challengeEntries.id, body.loserEntryId),
+        eq(challengeEntries.challengeId, challengeId)
+      )
+    )
+    .get();
+  if (!winner || !loser) return c.json({ error: "entry not found" }, 404);
+
+  const [newWinner, newLoser] = applyMatch(winner.elo, loser.elo, "a");
+  await db
+    .update(challengeEntries)
+    .set({ elo: newWinner })
+    .where(eq(challengeEntries.id, winner.id));
+  await db
+    .update(challengeEntries)
+    .set({ elo: newLoser })
+    .where(eq(challengeEntries.id, loser.id));
+
+  return c.json({ winner: newWinner, loser: newLoser });
+});
+
+// The challenge leaderboard (entries ranked by challenge Elo).
+route.get("/:id/leaderboard", async (c) => {
+  const db = getDb(c.env);
+  const rows = await db
+    .select({
+      id: challengeEntries.id,
+      outfitId: challengeEntries.outfitId,
+      userId: challengeEntries.userId,
+      elo: challengeEntries.elo,
+    })
+    .from(challengeEntries)
+    .where(eq(challengeEntries.challengeId, c.req.param("id")))
+    .orderBy(desc(challengeEntries.elo))
+    .limit(50)
+    .all();
+  return c.json(rows);
 });
 
 export default route;
