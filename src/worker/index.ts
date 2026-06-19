@@ -13,6 +13,7 @@ import intelligence from "./routes/intelligence";
 import search from "./routes/search";
 import challenges from "./routes/challenges";
 import media from "./routes/media";
+import { capabilities } from "./lib/fallback";
 
 // One Worker serves both the API and the React app. Hono owns /api/*; anything
 // else is delegated to the static assets binding (the built SPA).
@@ -24,16 +25,18 @@ app.get("/api/health", (c) => c.json({ status: "ok" }));
 // can tell at a glance whether AI features are degraded to their fallbacks.
 app.get("/api/status", (c) => {
   const env = c.env;
+  const caps = capabilities(env);
   return c.json({
     status: "ok",
     services: {
       db: !!env.DB,
       media: !!env.MEDIA,
       cache: !!env.CACHE,
-      ai: !!env.AI,
-      vectorize: !!env.VECTORIZE,
-      aiGateway: !!env.AI_GATEWAY_ID,
+      ...caps,
     },
+    // When AI is off, features fall back to deterministic behaviour rather than
+    // failing — the client uses this to show an "AI features limited" note.
+    aiDegraded: !caps.ai,
     // In dev the app trusts ACCESS_DEV_EMAIL; in prod Access verifies the JWT.
     authMode: env.ACCESS_DEV_EMAIL ? "dev" : "access",
   });

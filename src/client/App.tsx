@@ -22,6 +22,7 @@ import type { UserProfile } from "../shared/types";
 export function App() {
   const [me, setMe] = useState<UserProfile | null>(null);
   const [ready, setReady] = useState(false);
+  const [aiDegraded, setAiDegraded] = useState(false);
 
   useEffect(() => {
     api
@@ -29,6 +30,11 @@ export function App() {
       .then(setMe)
       .catch(() => setMe(null))
       .finally(() => setReady(true));
+    // Surface a banner when AI services aren't configured (fallbacks in use).
+    api
+      .status()
+      .then((s) => setAiDegraded(s.aiDegraded))
+      .catch(() => setAiDegraded(false));
   }, []);
 
   if (!ready) {
@@ -46,6 +52,12 @@ export function App() {
             </a>
           )}
         </header>
+
+        {aiDegraded && (
+          <div className="ai-banner">
+            AI features are running in fallback mode.
+          </div>
+        )}
 
         <main className="content">
           <Routes>

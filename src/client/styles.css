@@ -842,3 +842,13 @@ button.small {
   border: none;
   cursor: pointer;
 }
+
+
+.ai-banner {
+  background: rgba(204, 167, 0, 0.15);
+  color: #e0c04a;
+  font-size: 0.8rem;
+  text-align: center;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border);
+}
