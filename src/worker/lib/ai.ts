@@ -11,9 +11,24 @@ export const MODELS = {
   embedding: "@cf/baai/bge-base-en-v1.5",
 } as const;
 
-// Gateway options applied to every AI call when AI_GATEWAY_ID is set.
+// Options applied to every AI call. When AI_GATEWAY_ID is set we route through
+// the AI Gateway, which gives us response caching + request analytics for free.
+// skipCache is left false so repeated identical prompts (e.g. Style DNA for an
+// unchanged wardrobe) are served from the gateway cache.
 function gatewayOptions(env: Env) {
-  return env.AI_GATEWAY_ID ? { gateway: { id: env.AI_GATEWAY_ID } } : undefined;
+  if (!env.AI_GATEWAY_ID) return undefined;
+  return {
+    gateway: {
+      id: env.AI_GATEWAY_ID,
+      skipCache: false,
+      cacheTtl: 60 * 60, // 1 hour
+    },
+  };
+}
+
+// Reports whether the AI Gateway is configured, for the observability endpoint.
+export function gatewayConfigured(env: Env): boolean {
+  return !!env.AI_GATEWAY_ID;
 }
 
 export function aiAvailable(env: Env): boolean {

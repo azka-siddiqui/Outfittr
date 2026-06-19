@@ -20,6 +20,25 @@ const app = new Hono<{ Bindings: Env }>();
 
 app.get("/api/health", (c) => c.json({ status: "ok" }));
 
+// Lightweight observability: reports which optional services are wired up so we
+// can tell at a glance whether AI features are degraded to their fallbacks.
+app.get("/api/status", (c) => {
+  const env = c.env;
+  return c.json({
+    status: "ok",
+    services: {
+      db: !!env.DB,
+      media: !!env.MEDIA,
+      cache: !!env.CACHE,
+      ai: !!env.AI,
+      vectorize: !!env.VECTORIZE,
+      aiGateway: !!env.AI_GATEWAY_ID,
+    },
+    // In dev the app trusts ACCESS_DEV_EMAIL; in prod Access verifies the JWT.
+    authMode: env.ACCESS_DEV_EMAIL ? "dev" : "access",
+  });
+});
+
 app.route("/api/me", me);
 app.route("/api/outfits", outfits);
 app.route("/api/collections", collections);
