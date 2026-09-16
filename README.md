@@ -1,6 +1,6 @@
-# Rackd
+# Outfittr
 
-Rackd is a social wardrobe app for uploading, organizing, sharing, and ranking outfits.
+Outfittr is a social wardrobe app for uploading, organizing, sharing, and ranking outfits.
 Think of it as a digital closet with head-to-head rankings, social discovery, and AI-powered style insights.
 
 ## Features
